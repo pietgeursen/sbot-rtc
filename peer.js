@@ -2,8 +2,8 @@ var signalhub = require('signalhub')
 var wrtc = require('wrtc')
 var swarm = require('webrtc-swarm');
 
-var hub = signalhub('my-app-name', [
-  'localhost:9000'
+var hub = signalhub('scuttlebutts', [
+  'https://signalhub-jccqtwhdwc.now.sh'
 ])
 
 var sw = swarm(hub, {
@@ -11,7 +11,7 @@ var sw = swarm(hub, {
 })
 
 sw.on('peer', function (peer, id) {
-  console.log('connected to a new peer:', peer.id)
+  console.log('connected to a new peer:', peer)
   console.log('total peers:', sw.peers.length)
 })
 

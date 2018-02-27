@@ -23,6 +23,13 @@ This touches a lot in the stack.
   - secretstack
     - multiserver
 
+## Open issues to think about:
+
+- handling the is downloading state when scheduling peer connections.
+- version numbers!
+- weaving the hubs list into the multiserver server. => DONE!
+- sorting hubs if they fail to connect. 
+
 ## Peers state manager
 
 ### State
@@ -52,6 +59,7 @@ This touches a lot in the stack.
 `REMOTE_PEER_DID_DISCONNECT`
 `REMOTE_PEER_CONNECTION_SUCCEEDED`
 `REMOTE_PEER_CONNECTION_FAILED`
+`DISCONNECT_FROM_REMOTE_PEER`
 `HUB_ADDRESS_ADDED`
 `HUB_ADDRESS_REMOVED`
 `HUB_CONNECTION_SUCCEEDED`
@@ -69,7 +77,7 @@ This touches a lot in the stack.
 ### Example flow
 
 //load up stored hubs
-//dispatch `HUB_ADDRESS_ADDED` for each know address.
+//dispatch `HUB_ADDRESS_ADDED` for each known address.
 //this will kick off:
 // - `SCHEDULE_CONNECT_TO_HUB`
 //this will succeed or fail. On failure:

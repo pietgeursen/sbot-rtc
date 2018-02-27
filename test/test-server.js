@@ -13,6 +13,7 @@ CreateTestSbot
   .use({
     init: (server) => {
       console.log('server init');
+      server.emit("RTC_HUB_ADDED", introducerAddress)
     },
     name: 'rtc-server'
   })

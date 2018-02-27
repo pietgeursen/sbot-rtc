@@ -16,6 +16,7 @@ test('connects and replicates', function(t) {
     .use({
       init: (server) => {
         console.log('server init');
+        server.emit("RTC_HUB_ADDED", introducerAddress)
         server.connect(serverRTCAddress, (err, res) => {
         })
       },
@@ -28,12 +29,11 @@ test('connects and replicates', function(t) {
     type: 'contact',
     contact: serverKeys.id,
     following: true 
-  }, console.log)
+  }, ()=>{})
 
   pull(
     clientBot.createHistoryStream({id: serverKeys.id, live: true}),
     pull.drain(data => {
-      console.log('Got data over p2p', data);  
       t.ok(true)
       t.end()
       clientBot.close()

@@ -10,13 +10,13 @@ var introducerAddress = 'signalhub-hzbibrznqa.now.sh'
 var introducerPort = '80'
 var serverRTCAddress = `rtc:${introducerAddress}:${introducerPort}~shs:${serverKey}`
 
-test('connects and replicates', function(t) {
+test('connects and replicates', function (t) {
   CreateTestSbot
     .use(require('scuttlebot/plugins/replicate'))
     .use({
       init: (server) => {
-        console.log('server init');
-        server.emit("RTC_HUB_ADDED", introducerAddress)
+        console.log('server init')
+        server.emit('RTC_HUB_ADDED', introducerAddress)
         server.connect(serverRTCAddress, (err, res) => {
         })
       },
@@ -28,8 +28,8 @@ test('connects and replicates', function(t) {
   clientBot.publish({
     type: 'contact',
     contact: serverKeys.id,
-    following: true 
-  }, ()=>{})
+    following: true
+  }, () => {})
 
   pull(
     clientBot.createHistoryStream({id: serverKeys.id, live: true}),

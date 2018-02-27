@@ -1,7 +1,7 @@
 var test = require('tape')
 var CreateTestSbot = require('scuttle-testbot')
 var {serverKeys, clientKeys} = require('./keys.json')
-var ssbRef = require('ssb-ref');
+var ssbRef = require('ssb-ref')
 
 var clientKey = clientKeys.id.match(ssbRef.feedIdRegex)[1]
 var introducerAddress = 'signalhub-hzbibrznqa.now.sh'
@@ -12,14 +12,14 @@ CreateTestSbot
   .use(require('scuttlebot/plugins/replicate'))
   .use({
     init: (server) => {
-      console.log('server init');
-      server.emit("RTC_HUB_ADDED", introducerAddress)
+      console.log('server init')
+      server.emit('RTC_HUB_ADDED', introducerAddress)
     },
     name: 'rtc-server'
   })
 
 var serverBot = CreateTestSbot({name: 'serverBot', keys: serverKeys})
-serverBot.publish({type: 'derp', content: "dskjfd"}, ()=>{})
+serverBot.publish({type: 'derp', content: 'dskjfd'}, () => {})
 
-//serverBot.replicate.request(clientKeys.id)
-//initatorBot.close()
+// serverBot.replicate.request(clientKeys.id)
+// initatorBot.close()

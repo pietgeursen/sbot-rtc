@@ -73,6 +73,8 @@ This touches a lot in the stack.
 
 ### Example flow
 
+TODO: flow diagram
+
 //load up stored hubs
 //dispatch `HUB_ADDRESS_ADDED` for each known address.
 //this will kick off:

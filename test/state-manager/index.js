@@ -3,8 +3,8 @@ var {start} = require('inu')
 var App = require('../../state-manager/')
 var pull = require('pull-stream')
 
-test('', function(t) {
-  const {actions, effects} = start(App({Hub: ()=> {}}))
+test('', function (t) {
+  const {actions, effects} = start(App({Hub: () => {}}))
 
   pull(
     actions(),
@@ -17,4 +17,3 @@ test('', function(t) {
   )
   t.end()
 })
-

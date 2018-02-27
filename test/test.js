@@ -1,13 +1,13 @@
 var test = require('tape')
 var {serverKeys, clientKeys} = require('./keys.json')
-var ssbRef = require('ssb-ref');
+var ssbRef = require('ssb-ref')
 
 var serverKey = serverKeys.id.match(ssbRef.feedIdRegex)[1]
 var introducerAddress = 'signalhub-hzbibrznqa.now.sh'
 var introducerPort = '80'
 var serverRTCAddress = `rtc:${introducerAddress}:${introducerPort}~shs:${serverKey}`
 
-//CreateTestSbot
+// CreateTestSbot
 //  .use(require('scuttlebot/plugins/gossip'))
 //  .use({
 //    init: (server) => {
@@ -15,10 +15,10 @@ var serverRTCAddress = `rtc:${introducerAddress}:${introducerPort}~shs:${serverK
 //    name: 'rtc-server'
 //  })
 //
-//var serverBot = CreateTestSbot({name: 'serverBot', keys: serverKeys})
+// var serverBot = CreateTestSbot({name: 'serverBot', keys: serverKeys})
 //
 //
-//CreateTestSbot
+// CreateTestSbot
 //  .use({
 //    init: (server) => {
 //      console.log('server init');
@@ -27,12 +27,10 @@ var serverRTCAddress = `rtc:${introducerAddress}:${introducerPort}~shs:${serverK
 //    name: 'rtc-client'
 //  })
 //
-//var clientBot = CreateTestSbot({name: 'clientBot', keys: clientKeys})
+// var clientBot = CreateTestSbot({name: 'clientBot', keys: clientKeys})
 
-
-test('connects and replicates', function(t) {
-
-  var expected = {type: 'test', content: 'So. Cool.'} 
+test('connects and replicates', function (t) {
+  var expected = {type: 'test', content: 'So. Cool.'}
 
   var CreateServer = require('scuttle-testbot')
 
@@ -40,14 +38,14 @@ test('connects and replicates', function(t) {
     .use(require('scuttlebot/plugins/replicate'))
     .use({
       init: (server) => {
-        console.log('server init');
+        console.log('server init')
       },
       name: 'rtc-server'
     })
 
   var serverBot = CreateServer({name: 'serverBot', keys: serverKeys})
   console.log(CreateServer)
-  serverBot.publish(expected, ()=>{})
+  serverBot.publish(expected, () => {})
 
   var CreateClient = require('scuttle-testbot')
 
@@ -66,7 +64,7 @@ test('connects and replicates', function(t) {
   clientBot.publish({
     type: 'contact',
     contact: serverKeys.id,
-    following: true 
+    following: true
   }, () => {})
 
   pull(
@@ -81,4 +79,4 @@ test('connects and replicates', function(t) {
 
   clientBot.replicate.request(serverKeys.id)
 })
-//initatorBot.close()
+// initatorBot.close()

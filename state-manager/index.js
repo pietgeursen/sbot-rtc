@@ -1,5 +1,8 @@
+'use strict'
+
 var fs = require('fs')
 var {start, pull} = require('inu')
+var pullAsync = require('pull-async')
 var wrtc = require('wrtc')
 var SignalHub = require('signalhub')
 
@@ -27,7 +30,7 @@ function remotePeerDidAnnounce (peer) {
   }
 }
 
-function hubConnectionAdded (address) {
+function hubAddressAdded (address) {
   return {
     type: HUB_ADDRESS_ADDED,
     address
@@ -41,15 +44,19 @@ function scheduleAnnounceToHub (address) {
   }
 }
 
-function scheduleAddKnownHubs (addresses) {
+function scheduleAddKnownHubs () {
   return {
-    type: SCHEDULE_ADD_KNOWN_HUBS,
-    addresses
+    type: SCHEDULE_ADD_KNOWN_HUBS
   }
 }
 
+function loadKnownHubs ({filePath}, cb) {
+  filePath = filePath || './known_rtc_hubs.json'
+  fs.readFile(filePath, cb)
+}
+
 module.exports = function App ({Hub, pubKey}) {
-  var Hub = Hub || function Hub (hub) {
+  Hub = Hub || function Hub (hub) {
     return SignalHub('sbot-rtc-gossip', 'https://' + hub) // TODO: version number
   }
 
@@ -65,7 +72,7 @@ module.exports = function App ({Hub, pubKey}) {
           }
 
         },
-        effect: [SCHEDULE_PEERS_UPDATE_TICK]
+        effect: scheduleAddKnownHubs()
       }
     },
     update: function (model, action) {
@@ -87,17 +94,19 @@ module.exports = function App ({Hub, pubKey}) {
       switch (effect.type) {
         case SCHEDULE_ANNOUNCE_TO_HUB: // wonder if there is a better naming???
           const hub = Hub(effect.address)
+
           hub.broadcast('PEER_ANNOUNCE', {id: pubKey})
 
           // TODO: for debugging
           hub.subscribt('PEER_ANNOUNCE')
             .on('data', console.log)
+          break
 
+        case SCHEDULE_ADD_KNOWN_HUBS:
           return pull(
-            pull.once(address),
-            pull.asyncMap((address, cb) => {
-
-            })
+            pullAsync(loadKnownHubs),
+            pull.flatten(),
+            pull.map(hubAddressAdded)
           )
       }
     }

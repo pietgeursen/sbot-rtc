@@ -12,6 +12,7 @@
     "cuid": "^2.1.0",
     "inu": "^3.1.4",
     "once": "^1.4.0",
+    "pull-async": "^1.0.0",
     "scuttle-testbot": "^1.1.4",
     "signalhub": "^4.9.0",
     "simple-peer": "^8.3.0",

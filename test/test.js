@@ -1,5 +1,5 @@
 var test = require('tape')
-var {serverKeys, clientKeys} = require('../keys.json')
+var {serverKeys, clientKeys} = require('./keys.json')
 var ssbRef = require('ssb-ref');
 
 var serverKey = serverKeys.id.match(ssbRef.feedIdRegex)[1]

@@ -90,6 +90,7 @@ This touches a lot in the stack.
 
 TODO: flow diagram
 
+```
 //load up stored hubs
 //dispatch `HUB_ADDRESS_ADDED` for each known address.
 //this will kick off:
@@ -98,3 +99,4 @@ TODO: flow diagram
 // - `HUB_CONNECTION_FAILED`
 //on success:
 // - `HUB_CONNECTION_SUCCEEDED`
+```

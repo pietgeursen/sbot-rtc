@@ -73,10 +73,10 @@ Example state:
 
 ### Features
 
-- [ ] load a hub table
-- [ ] Announce as a peer to all hubs.
+- [x] load a hub table
+- [x] Announce as a peer to all hubs.
 - [ ] maintain a table of known peers.
-  - [ ] add a peer when they announce
+  - [x] add a peer when they announce
   - [ ] how do we remove a peer when they're gone?
     - [ ] a count of failures?
     - [ ] making sure a peer emits an event when it's about to disconnect.

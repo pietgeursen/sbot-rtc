@@ -3,6 +3,8 @@
 var fs = require('fs')
 var {start, pull} = require('inu')
 var pullAsync = require('pull-async')
+var Push = require('pull-pushable')
+var Cat = require('pull-cat')
 var wrtc = require('wrtc')
 var SignalHub = require('signalhub')
 
@@ -14,19 +16,40 @@ const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
 const DISCONNECT_FROM_REMOTE_PEER = Symbol('DISCONNECT_FROM_REMOTE_PEER')
 const HUB_ADDRESS_ADDED = Symbol('HUB_ADDRESS_ADDED')
 const HUB_ADDRESS_REMOVED = Symbol('HUB_ADDRESS_REMOVED')
+const KNOWN_HUBS_ADDED = Symbol('KNOWN_HUBS_ADDED')
+const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
 
 // Effects
-const SCHEDULE_PEERS_UPDATE_TICK = Symbol('SCHEDULE_PEERS_UPDATE_TICK')
+const SCHEDULE_START_PEER_CONNECTION_TICK = Symbol('SCHEDULE_START_PEER_CONNECTION_TICK')
 const SCHEDULE_ANNOUNCE_TO_HUB = Symbol('SCHEDULE_ANNOUNCE_TO_HUB')
 const SCHEDULE_SAVE_HUBS = Symbol('SCHEDULE_SAVE_HUBS')
 const SCHEDULE_CONNECT_TO_REMOTE_PEER = Symbol('SCHEDULE_CONNECT_TO_REMOTE_PEER')
 const SCHEDULE_BROADCAST_KNOWN_HUBS = Symbol('SCHEDULE_BROADCAST_KNOWN_HUBS')
 const SCHEDULE_ADD_KNOWN_HUBS = Symbol('SCHEDULE_ADD_KNOWN_HUBS')
 
-function remotePeerDidAnnounce (peer) {
+
+// Peer connection states
+const CONNECTION_STATE_CONNECTED = Symbol('CONNECTION_STATE_CONNECTED')
+const CONNECTION_STATE_DISCONNECTED = Symbol('CONNECTION_STATE_DISCONNECTED')
+const CONNECTION_STATE_CONNECTING = Symbol('CONNECTION_STATE_CONNECTING')
+
+function remotePeerDidAnnounce ({peer, hub}) {
   return {
     type: REMOTE_PEER_DID_ANNOUNCE,
-    peer
+    peer,
+    hub
+  }
+}
+
+function peerConnectionTimerTicked () {
+  return {
+    type: PEER_CONNECTION_TIMER_TICKED
+  }
+}
+
+function scheduleStartPeerConnectionTick () {
+  return {
+    type: SCHEDULE_START_PEER_CONNECTION_TICK
   }
 }
 
@@ -34,6 +57,12 @@ function hubAddressAdded (address) {
   return {
     type: HUB_ADDRESS_ADDED,
     address
+  }
+}
+
+function knownHubsAdded () {
+  return {
+    type: KNOWN_HUBS_ADDED
   }
 }
 
@@ -50,64 +79,92 @@ function scheduleAddKnownHubs () {
   }
 }
 
-function loadKnownHubs ({filePath}, cb) {
-  filePath = filePath || './known_rtc_hubs.json'
-  fs.readFile(filePath, cb)
-}
-
-module.exports = function App ({Hub, pubKey}) {
+module.exports = function App ({Hub, pubKey, loadHubs}) {
   Hub = Hub || function Hub (hub) {
     return SignalHub('sbot-rtc-gossip', 'https://' + hub) // TODO: version number
   }
+  const loadHubsFromFile = ({filePath}, cb) => {
+    filePath = filePath || './known_rtc_hubs.json'
+    fs.readFile(filePath, cb)
+  }
+
+  const loadKnownHubs = loadHubs || loadHubsFromFile
 
   return {
     init: function () {
       return {
         model: {
-          peers: {
-
-          },
           hubs: {
 
           }
-
         },
         effect: scheduleAddKnownHubs()
       }
     },
     update: function (model, action) {
       switch (action.type) {
-        case HUB_ADDRESS_ADDED:
+        case KNOWN_HUBS_ADDED: {
+          return {model, effect: scheduleStartPeerConnectionTick()}
+        }
+        case HUB_ADDRESS_ADDED: {
           if (model.hubs[action.address]) { return {model} }
-
           const newHub = {
             connection: null,
-            connectionAttempts: 0
+            connectionAttempts: 0,
+            peers: {}
           }
 
           model.hubs[action.address] = newHub
-
           return { model, effect: scheduleAnnounceToHub(action.address) }
+        }
+        case REMOTE_PEER_DID_ANNOUNCE: {
+          if (model.peers[action.peer] || action.peer === pubKey) { return {model} }
+
+          const newPeer = {
+            connectionsState: CONNECTION_STATE_DISCONNECTED
+          }
+          model[action.hub][action.peer] = newPeer
+          return {model}
+        }
+        default:
+          return {model}
       }
     },
     run: function (effect, sources) {
       switch (effect.type) {
-        case SCHEDULE_ANNOUNCE_TO_HUB: // wonder if there is a better naming???
+        case SCHEDULE_ANNOUNCE_TO_HUB: {
           const hub = Hub(effect.address)
+          const p = Push()
 
           hub.broadcast('PEER_ANNOUNCE', {id: pubKey})
 
-          // TODO: for debugging
-          hub.subscribt('PEER_ANNOUNCE')
-            .on('data', console.log)
-          break
+          hub.subscribe('PEER_ANNOUNCE')
+            .on('data', p.push)
 
-        case SCHEDULE_ADD_KNOWN_HUBS:
           return pull(
-            pullAsync(loadKnownHubs),
-            pull.flatten(),
-            pull.map(hubAddressAdded)
+            p,
+            pull.map((peer) => remotePeerDidAnnounce({peer, hub: effect.address}))
           )
+        }
+        case SCHEDULE_ADD_KNOWN_HUBS: {
+          return Cat([
+            pull.once(knownHubsAdded()),
+            pull(
+              pullAsync((cb) => loadKnownHubs({}, cb)),
+              pull.flatten(),
+              pull.map(hubAddressAdded)
+            )
+          ])
+        }
+
+        case SCHEDULE_START_PEER_CONNECTION_TICK: {
+          const p = Push()
+          setInterval(() => { p.push(peerConnectionTimerTicked()) }, 5e3)
+          return p
+        }
+        default: {
+          console.log('unknown effect:', effect)
+        }
       }
     }
   }

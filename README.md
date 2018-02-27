@@ -24,20 +24,20 @@ This touches a lot in the stack.
 
 ### State
 
+Example state:
 ```
 {
-  peers: {
-    pubKey:  {
-      peerConnection: simplePeerConnection,
-      connectionState: 'CONNECTING' | 'DISCONNECTED' | 'CONNECTED',
-      connectedHubs: ['signal-hub.com'],
-    } 
-  },
   hubs: {
     signal_hub.com: 
     {
       connection: signalHubConnection,
       connectionAttempts: 0
+      peers: {
+        [peerId]: {
+          peerConnection: simplePeerConnection,
+          connectionState: 'CONNECTING' | 'DISCONNECTED' | 'CONNECTED',
+        }
+      }
     },
   }
 }

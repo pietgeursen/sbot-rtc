@@ -2,16 +2,6 @@
 
 ## Modules
 
-- Existing structure of multiserver isn't going to make it easy to do this. The idea of servers listening to multiple hubs isn't super easy. Oh damn but what if you can start and stop the server for a given pub?
-
-- What if I just ignored the multiple signal-hub requirement and just used one for now?
-  - Then I'd only need to sort out:
-    - handling multi peers.
-    - connect / disconnect handling.
-    - peer discovery / announcing.
-    - scheduling (and this could be done later).
-    - all of which could be reused later.
-
 ## Deps
 
 This touches a lot in the stack.
@@ -27,8 +17,8 @@ This touches a lot in the stack.
 
 - handling the isDownloading state when scheduling peer connections.
 - version numbers!
-- weaving the hubs list into the multiserver server. => DONE!
 - sorting hubs if they fail to connect. 
+- weaving the hubs list into the multiserver server. => DONE!
 
 ## Peers state manager
 
@@ -73,17 +63,18 @@ This touches a lot in the stack.
 
 ### Features
 
-- load a hub table
-- Announce as a peer to all hubs.
-- maintain a table of known peers.
-  - add a peer when they announce
-  - how do we remove a peer when they're gone?
-    - a count of failures?
-    - making sure a peer emits an event when it's about to disconnect.
-    - check how swarm does it.
-- occasionally connect to some peers up to a maxiumum number of peers.
-- disconnect from a peer after some time. But not if it's downloading.
-- broadcast your table of known hubs to gossip them around. //??? 
+- [] load a hub table
+- [] Announce as a peer to all hubs.
+- [] maintain a table of known peers.
+  - [] add a peer when they announce
+  - [] how do we remove a peer when they're gone?
+    - [] a count of failures?
+    - [] making sure a peer emits an event when it's about to disconnect.
+    - [] check how swarm does it.
+- [] occasionally connect to some peers up to a maxiumum number of peers.
+- [] disconnect from a peer after some time. But not if it's downloading.
+- [] broadcast your table of known hubs to gossip them around. //??? 
+- [] include version number in hub app name
 
 ### Example flow
 

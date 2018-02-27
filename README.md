@@ -15,10 +15,10 @@ This touches a lot in the stack.
 
 ## Open issues to think about:
 
-- handling the isDownloading state when scheduling peer connections.
-- version numbers!
-- sorting hubs if they fail to connect. 
-- weaving the hubs list into the multiserver server. => DONE!
+- [] handling the isDownloading state when scheduling peer connections.
+- [] version numbers!
+- [] de-prioritising hubs / peers if they fail to connect. 
+- [] weaving the hubs list into the multiserver server. => DONE!
 
 ## Peers state manager
 
@@ -88,4 +88,3 @@ TODO: flow diagram
 // - `HUB_CONNECTION_FAILED`
 //on success:
 // - `HUB_CONNECTION_SUCCEEDED`
-

@@ -15,10 +15,10 @@ This touches a lot in the stack.
 
 ## Open issues to think about:
 
-- [] handling the isDownloading state when scheduling peer connections.
-- [] version numbers!
-- [] de-prioritising hubs / peers if they fail to connect. 
-- [] weaving the hubs list into the multiserver server. => DONE!
+- [ ] handling the isDownloading state when scheduling peer connections.
+- [ ] version numbers!
+- [ ] de-prioritising hubs / peers if they fail to connect. 
+- [ ] weaving the hubs list into the multiserver server. => DONE!
 
 ## Peers state manager
 
@@ -63,18 +63,18 @@ This touches a lot in the stack.
 
 ### Features
 
-- [] load a hub table
-- [] Announce as a peer to all hubs.
-- [] maintain a table of known peers.
-  - [] add a peer when they announce
-  - [] how do we remove a peer when they're gone?
-    - [] a count of failures?
-    - [] making sure a peer emits an event when it's about to disconnect.
-    - [] check how swarm does it.
-- [] occasionally connect to some peers up to a maxiumum number of peers.
-- [] disconnect from a peer after some time. But not if it's downloading.
-- [] broadcast your table of known hubs to gossip them around. //??? 
-- [] include version number in hub app name
+- [ ] load a hub table
+- [ ] Announce as a peer to all hubs.
+- [ ] maintain a table of known peers.
+  - [ ] add a peer when they announce
+  - [ ] how do we remove a peer when they're gone?
+    - [ ] a count of failures?
+    - [ ] making sure a peer emits an event when it's about to disconnect.
+    - [ ] check how swarm does it.
+- [ ] occasionally connect to some peers up to a maxiumum number of peers.
+- [ ] disconnect from a peer after some time. But not if it's downloading.
+- [ ] broadcast your table of known hubs to gossip them around. //??? 
+- [ ] include version number in hub app name
 
 ### Example flow
 

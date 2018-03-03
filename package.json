@@ -10,16 +10,12 @@
   "license": "ISC",
   "dependencies": {
     "cuid": "^2.1.0",
-    "inu": "^3.1.4",
-    "once": "^1.4.0",
-    "pull-async": "^1.0.0",
-    "pull-cat": "^1.1.11",
-    "pull-pushable": "^2.2.0",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.1",
     "scuttle-testbot": "^1.1.4",
     "signalhub": "^4.9.0",
-    "simple-peer": "^8.3.0",
-    "webrtc-swarm": "^2.9.0",
-    "wrtc": "0.0.66"
+    "simple-peer": "^8.3.0"
   },
   "devDependencies": {
     "ssb-keys": "^7.0.13",

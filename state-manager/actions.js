@@ -1,38 +1,23 @@
-// Actions
+var fs = require('fs')
+
+const NETWORK_DISCONNECT = Symbol('NETWORK_DISCONNECT')
+const NETWORK_CONNECT = Symbol('NETWORK_CONNECT')
+const RESET_ALL_HUBS = Symbol('RESET_ALL_HUBS')
+const CONNECT_TO_HUB = Symbol('CONNECT_TO_HUB')
+const ANNOUNCE_TO_HUB = Symbol('ANNOUNCE_TO_HUB')
+
+const ADD_HUB_ADDRESS = Symbol('ADD_HUB_ADDRESS')
+const HUB_ADDRESS_ADDED = Symbol('HUB_ADDRESS_ADDED')
+
 const REMOTE_PEER_DID_ANNOUNCE = Symbol('REMOTE_PEER_DID_ANNOUNCE')
 const REMOTE_PEER_DID_DISCONNECT = Symbol('REMOTE_PEER_DID_DISCONNECT')
 const REMOTE_PEER_CONNECTION_SUCCEEDED = Symbol('REMOTE_PEER_CONNECTION_SUCCEEDED')
 const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
 const DISCONNECT_FROM_REMOTE_PEER = Symbol('DISCONNECT_FROM_REMOTE_PEER')
-const HUB_ADDRESS_ADDED = Symbol('HUB_ADDRESS_ADDED')
-const HUB_ADDRESS_REMOVED = Symbol('HUB_ADDRESS_REMOVED')
-const KNOWN_HUBS_ADDED = Symbol('KNOWN_HUBS_ADDED')
 const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
-const EMITTED_NEW_HUB = Symbol('EMITTED_NEW_HUB')
 
 // Effects
-const SCHEDULE_START_PEER_CONNECTION_TICK = Symbol('SCHEDULE_START_PEER_CONNECTION_TICK')
-const SCHEDULE_ANNOUNCE_TO_HUB = Symbol('SCHEDULE_ANNOUNCE_TO_HUB')
-const SCHEDULE_SAVE_HUBS = Symbol('SCHEDULE_SAVE_HUBS')
-const SCHEDULE_CONNECT_TO_REMOTE_PEER = Symbol('SCHEDULE_CONNECT_TO_REMOTE_PEER')
-const SCHEDULE_BROADCAST_KNOWN_HUBS = Symbol('SCHEDULE_BROADCAST_KNOWN_HUBS')
-const SCHEDULE_ADD_KNOWN_HUBS = Symbol('SCHEDULE_ADD_KNOWN_HUBS')
-const SCHEDULE_SERVER_EMIT_NEW_HUB = Symbol('SCHEDULE_SERVER_EMIT_NEW_HUB')
-
-// Action creators
-function scheduleServerEmitNewHub ({hub}) {
-  return {
-    type: SCHEDULE_SERVER_EMIT_NEW_HUB,
-    hub
-  }
-}
-
-function emittedNewHub ({hub}) {
-  return {
-    type: EMITTED_NEW_HUB,
-    hub
-  }
-}
+const CONNECT_TO_REMOTE_PEER = Symbol('SCHEDULE_CONNECT_TO_REMOTE_PEER')
 
 function remotePeerDidAnnounce ({peer, hub}) {
   return {
@@ -48,12 +33,6 @@ function peerConnectionTimerTicked () {
   }
 }
 
-function scheduleStartPeerConnectionTick () {
-  return {
-    type: SCHEDULE_START_PEER_CONNECTION_TICK
-  }
-}
-
 function hubAddressAdded ({hub}) {
   return {
     type: HUB_ADDRESS_ADDED,
@@ -61,23 +40,13 @@ function hubAddressAdded ({hub}) {
   }
 }
 
-function knownHubsAdded () {
-  return {
-    type: KNOWN_HUBS_ADDED
-  }
-}
-
-function scheduleAnnounceToHub ({hub, id}) {
-  return {
-    type: SCHEDULE_ANNOUNCE_TO_HUB,
-    hub,
-    id
-  }
-}
-
-function scheduleAddKnownHubs () {
-  return {
-    type: SCHEDULE_ADD_KNOWN_HUBS
+function announceToHub ({hub, id}) {
+  return function (dispatch, getState) {
+    return {
+      type: ANNOUNCE_TO_HUB,
+      hub,
+      id
+    }
   }
 }
 
@@ -88,27 +57,14 @@ module.exports = {
   REMOTE_PEER_CONNECTION_FAILED,
   DISCONNECT_FROM_REMOTE_PEER,
   HUB_ADDRESS_ADDED,
-  HUB_ADDRESS_REMOVED,
-  KNOWN_HUBS_ADDED,
   PEER_CONNECTION_TIMER_TICKED,
-  EMITTED_NEW_HUB,
 
-  SCHEDULE_START_PEER_CONNECTION_TICK,
-  SCHEDULE_ANNOUNCE_TO_HUB,
-  SCHEDULE_SAVE_HUBS,
-  SCHEDULE_CONNECT_TO_REMOTE_PEER,
-  SCHEDULE_BROADCAST_KNOWN_HUBS,
-  SCHEDULE_ADD_KNOWN_HUBS,
-  SCHEDULE_SERVER_EMIT_NEW_HUB,
+  ANNOUNCE_TO_HUB,
+  CONNECT_TO_REMOTE_PEER,
 
-  emittedNewHub,
   remotePeerDidAnnounce,
   peerConnectionTimerTicked,
   hubAddressAdded,
-  knownHubsAdded,
 
-  scheduleServerEmitNewHub,
-  scheduleStartPeerConnectionTick,
-  scheduleAnnounceToHub,
-  scheduleAddKnownHubs
+  announceToHub
 }

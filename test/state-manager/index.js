@@ -23,62 +23,26 @@ function createMockHub () {
   }
 }
 
-test('start and stop and inu app', function(t) {
-  const app = {
-    init: function () {
-      return {
-        model: {},
-        effect: 'EFFECT'
-      }
-    },
-    run: function (effect) {
-      switch (effect) {
-        case 'EFFECT':
-          const p = Push()
-          return Cat([p])
-      }
-    }
-  }
+test('emitting hub address on stream adds that hub to the state', function (t) {
+  const hub = {address: 'dfjdfksdfd.com'}
+  const hubAddresses = Push()
+  const mockHub = createMockHub()
 
-  const {stop} = start(app)
-  stop()
-  t.ok(true)
+  const store = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
+
+  hubAddresses.push(hub)
+  const state = store.getState()
+  t.ok(state.hubs[hub.address])
   t.end()
 })
-test('app announces its peer id to hub', function (t) {
-  const loadHubs = (_, cb) => {
-    cb(null, [
-      'https://signalhub-jccqtwhdwc.now.sh'
-    ])
-  }
-  const expectedId = 'expectedId'
-  const hub = createMockHub()
 
-  //hub.subscribe('PEER_ANNOUNCE')
-  //  .on('data', ({id}) => {
-  //    t.equal(id, expectedId)
-  //    hub.emitter.removeAllListeners()
-  //  })
+test('peer announce adds peer to correct hub', function (t) {
+  const hub = {address: 'dfjdfksdfd.com'}
+  const hubAddresses = Push()
+  const store = App({hubAddresses: () => hubAddresses})
 
-  const {views, actions, effects, stop} = start(App({Hub: () => hub, loadHubs, pubKey: expectedId}))
-  pull(
-    actions(),
-    pull.drain(action => {
-      console.log(action)
-      stop()
-      t.ok(action)
-      t.end()
-    })
-  )
-
-  // pull(
-  //   effects(),
-  //   pull.filter((effect) => effect.type === SCHEDULE_ANNOUNCE_TO_HUB),
-  //   pull.take(1),
-  //   pull.drain(_ => {
-  //     t.ok(true)
-  //     t.end()
-  //     stop()
-  //   })
-  // )
+  hubAddresses.push(hub)
+  const state = store.getState()
+  t.ok(state.hubs[hub.address])
+  t.end()
 })

@@ -3,6 +3,7 @@ const Push = require('pull-pushable')
 const Cat = require('pull-cat')
 const EventEmitter = require('events')
 const { App, SCHEDULE_ANNOUNCE_TO_HUB, KNOWN_HUBS_ADDED } = require('../../state-manager/')
+const { remotePeerDidAnnounce } = require('../../state-manager/actions')
 const pull = require('pull-stream')
 const Hub = require('signalhub')
 
@@ -38,11 +39,15 @@ test('emitting hub address on stream adds that hub to the state', function (t) {
 
 test('peer announce adds peer to correct hub', function (t) {
   const hub = {address: 'dfjdfksdfd.com'}
+  const peer = {address: '@piet=.nope'}
   const hubAddresses = Push()
-  const store = App({hubAddresses: () => hubAddresses})
+  const mockHub = createMockHub()
+  const store = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
 
   hubAddresses.push(hub)
+  store.dispatch(remotePeerDidAnnounce({hub: hub.address, peer: peer.address}))
+
   const state = store.getState()
-  t.ok(state.hubs[hub.address])
+  t.ok(state.hubs[hub.address].peers[peer.address])
   t.end()
 })

@@ -1,29 +1,22 @@
-var fs = require('fs')
+const fs = require('fs')
 
-const NETWORK_DISCONNECT = Symbol('NETWORK_DISCONNECT')
-const NETWORK_CONNECT = Symbol('NETWORK_CONNECT')
-const RESET_ALL_HUBS = Symbol('RESET_ALL_HUBS')
+const NETWORK_DID_RECONNECT = Symbol('NETWORK_DID_RECONNECT')
 const CONNECT_TO_HUB = Symbol('CONNECT_TO_HUB')
 const ANNOUNCE_TO_HUB = Symbol('ANNOUNCE_TO_HUB')
 
-const ADD_HUB_ADDRESS = Symbol('ADD_HUB_ADDRESS')
 const HUB_ADDRESS_ADDED = Symbol('HUB_ADDRESS_ADDED')
 
 const REMOTE_PEER_DID_ANNOUNCE = Symbol('REMOTE_PEER_DID_ANNOUNCE')
 const REMOTE_PEER_DID_DISCONNECT = Symbol('REMOTE_PEER_DID_DISCONNECT')
+const REMOTE_PEER_CONNECTING = Symbol('REMOTE_PEER_CONNECTING')
 const REMOTE_PEER_CONNECTION_SUCCEEDED = Symbol('REMOTE_PEER_CONNECTION_SUCCEEDED')
 const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
-const DISCONNECT_FROM_REMOTE_PEER = Symbol('DISCONNECT_FROM_REMOTE_PEER')
+const REMOTE_PEER_DISCONNECT = Symbol('REMOTE_PEER_DISCONNECT')
 const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
 
-// Effects
-const CONNECT_TO_REMOTE_PEER = Symbol('SCHEDULE_CONNECT_TO_REMOTE_PEER')
-
-function remotePeerDidAnnounce ({peer, hub}) {
+function networkDidReconnect () {
   return {
-    type: REMOTE_PEER_DID_ANNOUNCE,
-    peer,
-    hub
+    type: NETWORK_DID_RECONNECT
   }
 }
 
@@ -50,21 +43,83 @@ function announceToHub ({hub, id}) {
   }
 }
 
+function connectToHub ({hub}) {
+  return {
+    type: CONNECT_TO_HUB,
+    hub
+  }
+}
+
+function remotePeerConnecting ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_CONNECTING,
+    hub,
+    peer
+  }
+}
+
+function remotePeerDidDisconnect ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_DID_DISCONNECT,
+    hub,
+    peer
+  }
+}
+
+function remotePeerConnectionSucceeded ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_CONNECTION_SUCCEEDED,
+    hub,
+    peer
+  }
+}
+
+function remotePeerConnectionFailed ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_CONNECTION_FAILED,
+    hub,
+    peer
+  }
+}
+
+function remotePeerDidAnnounce ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_DID_ANNOUNCE,
+    peer,
+    hub
+  }
+}
+
+function remotePeerDisconnect ({hub, peer}) {
+  return {
+    type: REMOTE_PEER_DISCONNECT,
+    peer,
+    hub
+  }
+}
+
 module.exports = {
   REMOTE_PEER_DID_ANNOUNCE,
   REMOTE_PEER_DID_DISCONNECT,
   REMOTE_PEER_CONNECTION_SUCCEEDED,
   REMOTE_PEER_CONNECTION_FAILED,
-  DISCONNECT_FROM_REMOTE_PEER,
-  HUB_ADDRESS_ADDED,
+  REMOTE_PEER_CONNECTING,
+  REMOTE_PEER_DISCONNECT,
   PEER_CONNECTION_TIMER_TICKED,
-
+  HUB_ADDRESS_ADDED,
+  NETWORK_DID_RECONNECT,
+  CONNECT_TO_HUB,
   ANNOUNCE_TO_HUB,
-  CONNECT_TO_REMOTE_PEER,
 
   remotePeerDidAnnounce,
-  peerConnectionTimerTicked,
+  remotePeerDidDisconnect,
+  remotePeerConnectionSucceeded,
+  remotePeerConnectionFailed,
+  remotePeerConnecting,
+  remotePeerDisconnect,
+  peerConnectionTimerTicked, //has side effect
   hubAddressAdded,
-
-  announceToHub
+  networkDidReconnect,
+  connectToHub, //has side effect
+  announceToHub //has side effect
 }

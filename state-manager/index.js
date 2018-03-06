@@ -5,6 +5,8 @@ const pull = require('pull-stream')
 const SignalHub = require('signalhub')
 const { createSelector } = require('reselect')
 const { createStore, applyMiddleware } = require('redux')
+const onWakeup = require('on-wakeup')
+const onNetwork = require('on-change-network')
 const thunk = require('redux-thunk').default
 
 const reducer = require('./reducer')

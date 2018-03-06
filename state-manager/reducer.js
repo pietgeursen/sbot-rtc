@@ -1,11 +1,7 @@
 var {
-  KNOWN_HUBS_ADDED,
   HUB_ADDRESS_ADDED,
-  EMITTED_NEW_HUB,
   REMOTE_PEER_DID_ANNOUNCE,
-  scheduleStartPeerConnectionTick,
-  scheduleServerEmitNewHub,
-  scheduleAnnounceToHub
+  NETWORK_DID_RECONNECT
 } = require('./actions')
 
 var { CONNECTION_STATE_DISCONNECTED } = require('./connection-state-types')
@@ -22,13 +18,20 @@ var { CONNECTION_STATE_DISCONNECTED } = require('./connection-state-types')
 
 //  const loadKnownHubs = loadHubs || loadHubsFromFile
 
-module.exports = function (state, action) {
+module.exports = function reducer (state, action) {
   switch (action.type) {
+    case NETWORK_DID_RECONNECT: {
+      const newState = Object.assign({}, state)
+
+      Object.keys(newState.hubs).forEach(hubKey => {
+        newState.hubs[hubKey].peers = {}
+      })
+      return newState
+    }
     case HUB_ADDRESS_ADDED: {
       if (state.hubs[action.hub]) { return state }
       const newHub = {
         connection: null,
-        connectionAttempts: 0,
         peers: {}
       }
 
@@ -36,13 +39,14 @@ module.exports = function (state, action) {
       return newModel
     }
     case REMOTE_PEER_DID_ANNOUNCE: {
-      if (state.hubs[action.hub].peers[action.peer] || action.peer === state.pubKey) { return {state} }
+      if (state.hubs[action.hub].peers[action.peer] || action.peer === state.pubKey) { return state }
 
       const newPeer = {
-        connectionsState: CONNECTION_STATE_DISCONNECTED
+        connectionState: CONNECTION_STATE_DISCONNECTED
       }
-      const newModel = Object.assign({}, state, { hubs: {[action.hub]: {peers: {[action.peer]: newPeer}}} })
-      return {state: newModel}
+
+      state.hubs[action.hub].peers[action.peer] = newPeer
+      return Object.assign({}, state)
     }
     default:
       return state

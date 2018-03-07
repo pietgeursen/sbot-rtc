@@ -201,7 +201,6 @@ test('REMOTE_PEER_DID_DISCONNECT', function (t) {
   const peer1 = {address: '@piet=.nope'}
   const action = remotePeerDidDisconnect({peer: peer1.address, hub: hub1.address})
   const initialState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -217,7 +216,6 @@ test('REMOTE_PEER_DID_DISCONNECT', function (t) {
     }
   }
   const expectedState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -243,7 +241,6 @@ test('REMOTE_PEER_CONNECTING', function (t) {
   const peer1 = {address: '@piet=.nope'}
   const action = remotePeerConnecting({peer: peer1.address, hub: hub1.address})
   const initialState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -259,7 +256,6 @@ test('REMOTE_PEER_CONNECTING', function (t) {
     }
   }
   const expectedState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -283,14 +279,13 @@ test('REMOTE_PEER_CONNECTION_SUCCEEDED', function (t) {
   const hub1 = {address: 'hub1.com'}
   const hub2 = {address: 'hub2.com'}
   const peer1 = {address: '@piet=.nope'}
-  const action = remotePeerConnecting({peer: peer1.address, hub: hub1.address})
+  const action = remotePeerConnectionSucceeded({peer: peer1.address, hub: hub1.address})
   const initialState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
           [peer1.address]: {
-            connectionState: CONNECTION_STATE_DISCONNECTED
+            connectionState: CONNECTION_STATE_CONNECTING
           }
         }
       },
@@ -301,12 +296,11 @@ test('REMOTE_PEER_CONNECTION_SUCCEEDED', function (t) {
     }
   }
   const expectedState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
           [peer1.address]: {
-            connectionState: CONNECTION_STATE_CONNECTING
+            connectionState: CONNECTION_STATE_CONNECTED
           }
         }
       },
@@ -317,7 +311,7 @@ test('REMOTE_PEER_CONNECTION_SUCCEEDED', function (t) {
     }
   }
   const newState = reducer(initialState, action)
-  t.deepEqual(newState, expectedState, 'existing peer state changes to connecting')
+  t.deepEqual(newState, expectedState, 'existing peer state changes to connected')
   t.end()
 })
 
@@ -327,7 +321,6 @@ test('REMOTE_PEER_CONNECTION_FAILED', function (t) {
   const peer1 = {address: '@piet=.nope'}
   const action = remotePeerConnectionFailed({peer: peer1.address, hub: hub1.address})
   const initialState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -343,7 +336,6 @@ test('REMOTE_PEER_CONNECTION_FAILED', function (t) {
     }
   }
   const expectedState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -369,7 +361,6 @@ test('REMOTE_PEER_DISCONNECT', function (t) {
   const peer1 = {address: '@piet=.nope'}
   const action = remotePeerDisconnect({peer: peer1.address, hub: hub1.address})
   const initialState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {
@@ -385,7 +376,6 @@ test('REMOTE_PEER_DISCONNECT', function (t) {
     }
   }
   const expectedState = {
-    pubKey: peer1.address,
     hubs: {
       [hub1.address]: {
         peers: {

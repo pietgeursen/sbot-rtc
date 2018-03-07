@@ -1,6 +1,12 @@
 var test = require('tape')
 var reducer = require('../../state-manager/reducer')
-var {CONNECTION_STATE_DISCONNECTED} = require('../../state-manager/connection-state-types')
+var {
+  CONNECTION_STATE_DISCONNECTED,
+  CONNECTION_STATE_CONNECTED,
+  CONNECTION_STATE_CONNECTING,
+  CONNECTION_STATE_DISCONNECTING
+} = require('../../state-manager/connection-state-types')
+
 var {
   REMOTE_PEER_CONNECTING,
   REMOTE_PEER_DISCONNECT,
@@ -17,10 +23,10 @@ var {
   remotePeerConnecting,
   remotePeerDisconnect,
   hubAddressAdded,
-  networkDidReconnect,
+  networkDidReconnect
 } = require('../../state-manager/actions')
 
-test('NETWORK_DID_RECONNECT', function(t) {
+test('NETWORK_DID_RECONNECT', function (t) {
   const hub1 = {address: 'hub1.com'}
   const hub2 = {address: 'hub2.com'}
   const peer1 = {address: '@piet=.nope'}
@@ -64,7 +70,7 @@ test('NETWORK_DID_RECONNECT', function(t) {
   t.end()
 })
 
-test('HUB_ADDRESS_ADDED', function(t) {
+test('HUB_ADDRESS_ADDED', function (t) {
   const hub = {address: 'dfjdfksdfd.com'}
   const action = hubAddressAdded({ hub: hub.address })
   const initialState = {hubs: {}}
@@ -74,7 +80,7 @@ test('HUB_ADDRESS_ADDED', function(t) {
   t.end()
 })
 
-test('REMOTE_PEER_DID_ANNOUNCE', function(t) {
+test('REMOTE_PEER_DID_ANNOUNCE', function (t) {
   const hub1 = {address: 'hub1.com'}
   const hub2 = {address: 'hub2.com'}
   const peer1 = {address: '@piet=.nope'}
@@ -147,7 +153,7 @@ test("REMOTE_PEER_DID_ANNOUNCE doesn't add peer if its our address", function (t
   t.end()
 })
 
-test.skip('REMOTE_PEER_DID_ANNOUNCE what happens if an existin peer re-announces?', function (t) {
+test('REMOTE_PEER_DID_ANNOUNCE if an existing peer re-announces, no change to the peer', function (t) {
   const hub1 = {address: 'hub1.com'}
   const hub2 = {address: 'hub2.com'}
   const peer1 = {address: '@piet=.nope'}
@@ -157,6 +163,9 @@ test.skip('REMOTE_PEER_DID_ANNOUNCE what happens if an existin peer re-announces
     hubs: {
       [hub1.address]: {
         peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTED
+          }
         }
       },
       [hub2.address]: {
@@ -170,6 +179,9 @@ test.skip('REMOTE_PEER_DID_ANNOUNCE what happens if an existin peer re-announces
     hubs: {
       [hub1.address]: {
         peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTED
+          }
         }
       },
       [hub2.address]: {
@@ -179,31 +191,216 @@ test.skip('REMOTE_PEER_DID_ANNOUNCE what happens if an existin peer re-announces
     }
   }
   const newState = reducer(initialState, action)
-  t.deepEqual(newState, expectedState, 'peer is not added')
+  t.deepEqual(newState, expectedState, 'existing peer is not changed')
   t.end()
 })
 
-test('REMOTE_PEER_DID_DISCONNECT', function(t) {
-
+test('REMOTE_PEER_DID_DISCONNECT', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = remotePeerDidDisconnect({peer: peer1.address, hub: hub1.address})
+  const initialState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_DISCONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'existing peer state changes to disconnected')
   t.end()
 })
 
-test('REMOTE_PEER_CONNECTING', function(t) {
-
+test('REMOTE_PEER_CONNECTING', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = remotePeerConnecting({peer: peer1.address, hub: hub1.address})
+  const initialState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_DISCONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTING
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'existing peer state changes to connecting')
   t.end()
 })
 
-test('REMOTE_PEER_CONNECTION_SUCCEEDED', function(t) {
-
+test('REMOTE_PEER_CONNECTION_SUCCEEDED', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = remotePeerConnecting({peer: peer1.address, hub: hub1.address})
+  const initialState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_DISCONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTING
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'existing peer state changes to connecting')
   t.end()
 })
 
-test('REMOTE_PEER_CONNECTION_FAILED', function(t) {
-
+test('REMOTE_PEER_CONNECTION_FAILED', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = remotePeerConnectionFailed({peer: peer1.address, hub: hub1.address})
+  const initialState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTING
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_DISCONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'existing peer state changes to disconnected')
   t.end()
 })
 
-test('REMOTE_PEER_DISCONNECT', function(t) {
-
+test('REMOTE_PEER_DISCONNECT', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = remotePeerDisconnect({peer: peer1.address, hub: hub1.address})
+  const initialState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    pubKey: peer1.address,
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_DISCONNECTING
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'existing peer state changes to disconnecting')
   t.end()
 })

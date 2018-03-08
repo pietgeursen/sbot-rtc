@@ -12,7 +12,6 @@ const thunk = require('redux-thunk').default
 
 const reducer = require('./reducer')
 const { Actions } = require('./actions')
-const { hubAddressAdded } = Actions({})
 
 const loggerColors = {
   title: false,
@@ -23,7 +22,10 @@ const loggerColors = {
 }
 
 function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
-  const store = createStore(reducer, {hubs: {}}, applyMiddleware(createLogger({colors: loggerColors}), thunk))
+  const logger = createLogger({colors: loggerColors})
+  const store = createStore(reducer, {hubs: {}}, applyMiddleware(logger, thunk))
+  const actions = Actions({Hub, pubKey, server})
+  const { hubAddressAdded } = actions
 
   pull(
     hubAddresses(),
@@ -32,10 +34,7 @@ function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
     })
   )
 
-  Hub()
-    .subscribe()
-
-  return store
+  return { store, actions }
 }
 
 module.exports = {

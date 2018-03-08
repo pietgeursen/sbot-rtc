@@ -14,7 +14,7 @@ const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
 const REMOTE_PEER_DISCONNECT = Symbol('REMOTE_PEER_DISCONNECT')
 const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
 
-function Actions ({ sbot, Hub, pubKey }) {
+function Actions ({ server, Hub, pubKey }) {
   function networkDidReconnect () {
     return {
       type: NETWORK_DID_RECONNECT

@@ -29,7 +29,7 @@ test('emitting hub address on stream adds that hub to the state', function (t) {
   const hubAddresses = Push()
   const mockHub = createMockHub()
 
-  const store = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
+  const { store } = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
 
   hubAddresses.push(hub)
   const state = store.getState()
@@ -42,7 +42,7 @@ test('peer announce adds peer to correct hub', function (t) {
   const peer = {address: '@piet=.nope'}
   const hubAddresses = Push()
   const mockHub = createMockHub()
-  const store = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
+  const { store } = App({hubAddresses: () => hubAddresses, Hub: () => mockHub})
 
   hubAddresses.push(hub)
   store.dispatch(remotePeerDidAnnounce({hub: hub.address, peer: peer.address}))

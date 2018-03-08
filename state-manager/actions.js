@@ -14,90 +14,108 @@ const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
 const REMOTE_PEER_DISCONNECT = Symbol('REMOTE_PEER_DISCONNECT')
 const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
 
-function networkDidReconnect () {
-  return {
-    type: NETWORK_DID_RECONNECT
-  }
-}
-
-function peerConnectionTimerTicked () {
-  return {
-    type: PEER_CONNECTION_TIMER_TICKED
-  }
-}
-
-function hubAddressAdded ({hub}) {
-  return {
-    type: HUB_ADDRESS_ADDED,
-    hub
-  }
-}
-
-function announceToHub ({hub, id}) {
-  return function (dispatch, getState) {
+function Actions ({ sbot, Hub, pubKey }) {
+  function networkDidReconnect () {
     return {
-      type: ANNOUNCE_TO_HUB,
-      hub,
-      id
+      type: NETWORK_DID_RECONNECT
     }
   }
-}
 
-function connectToHub ({hub}) {
+  function peerConnectionTimerTicked () {
+    return {
+      type: PEER_CONNECTION_TIMER_TICKED
+    }
+  }
+
+  function hubAddressAdded ({hub}) {
+    return {
+      type: HUB_ADDRESS_ADDED,
+      hub
+    }
+  }
+
+  function announceToHub ({hub, id}) {
+    return function (dispatch, getState) {
+      const hubConnection = Hub(hub)
+      hubConnection.broadcast('PEER_ANNOUNCE', {id: pubKey})
+
+      hubConnection.subscribe('PEER_ANNOUNCE')
+        .on('data', (peer) => {
+          const action = remotePeerDidAnnounce({hub, peer: peer.id})
+          dispatch(action)
+        })
+    }
+  }
+
+  function connectToHub ({hub}) {
+    return {
+      type: CONNECT_TO_HUB,
+      hub
+    }
+  }
+
+  function remotePeerConnecting ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_CONNECTING,
+      hub,
+      peer
+    }
+  }
+
+  function remotePeerDidDisconnect ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_DID_DISCONNECT,
+      hub,
+      peer
+    }
+  }
+
+  function remotePeerConnectionSucceeded ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_CONNECTION_SUCCEEDED,
+      hub,
+      peer
+    }
+  }
+
+  function remotePeerConnectionFailed ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_CONNECTION_FAILED,
+      hub,
+      peer
+    }
+  }
+
+  function remotePeerDidAnnounce ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_DID_ANNOUNCE,
+      peer,
+      hub
+    }
+  }
+
+  function remotePeerDisconnect ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_DISCONNECT,
+      peer,
+      hub
+    }
+  }
+
   return {
-    type: CONNECT_TO_HUB,
-    hub
+    remotePeerDidAnnounce,
+    remotePeerDidDisconnect,
+    remotePeerConnectionSucceeded,
+    remotePeerConnectionFailed,
+    remotePeerConnecting,
+    remotePeerDisconnect,
+    peerConnectionTimerTicked, // has side effect
+    hubAddressAdded,
+    networkDidReconnect,
+    connectToHub, // has side effect
+    announceToHub // has side effect
   }
 }
-
-function remotePeerConnecting ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_CONNECTING,
-    hub,
-    peer
-  }
-}
-
-function remotePeerDidDisconnect ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_DID_DISCONNECT,
-    hub,
-    peer
-  }
-}
-
-function remotePeerConnectionSucceeded ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_CONNECTION_SUCCEEDED,
-    hub,
-    peer
-  }
-}
-
-function remotePeerConnectionFailed ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_CONNECTION_FAILED,
-    hub,
-    peer
-  }
-}
-
-function remotePeerDidAnnounce ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_DID_ANNOUNCE,
-    peer,
-    hub
-  }
-}
-
-function remotePeerDisconnect ({hub, peer}) {
-  return {
-    type: REMOTE_PEER_DISCONNECT,
-    peer,
-    hub
-  }
-}
-
 module.exports = {
   REMOTE_PEER_DID_ANNOUNCE,
   REMOTE_PEER_DID_DISCONNECT,
@@ -111,15 +129,5 @@ module.exports = {
   CONNECT_TO_HUB,
   ANNOUNCE_TO_HUB,
 
-  remotePeerDidAnnounce,
-  remotePeerDidDisconnect,
-  remotePeerConnectionSucceeded,
-  remotePeerConnectionFailed,
-  remotePeerConnecting,
-  remotePeerDisconnect,
-  peerConnectionTimerTicked, //has side effect
-  hubAddressAdded,
-  networkDidReconnect,
-  connectToHub, //has side effect
-  announceToHub //has side effect
+  Actions
 }

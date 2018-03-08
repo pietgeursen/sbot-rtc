@@ -7,13 +7,23 @@ const { createSelector } = require('reselect')
 const { createStore, applyMiddleware } = require('redux')
 const onWakeup = require('on-wakeup')
 const onNetwork = require('on-change-network')
+const {createLogger} = require('redux-logger')
 const thunk = require('redux-thunk').default
 
 const reducer = require('./reducer')
-const { hubAddressAdded } = require('./actions')
+const { Actions } = require('./actions')
+const { hubAddressAdded } = Actions({})
+
+const loggerColors = {
+  title: false,
+  prevState: false,
+  action: false,
+  nextState: false,
+  error: false
+}
 
 function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
-  const store = createStore(reducer, {hubs: {}}, applyMiddleware(thunk))
+  const store = createStore(reducer, {hubs: {}}, applyMiddleware(createLogger({colors: loggerColors}), thunk))
 
   pull(
     hubAddresses(),

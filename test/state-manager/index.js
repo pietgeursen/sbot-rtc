@@ -1,9 +1,9 @@
 const test = require('tape')
 const Push = require('pull-pushable')
-const Cat = require('pull-cat')
 const EventEmitter = require('events')
 const { App, SCHEDULE_ANNOUNCE_TO_HUB, KNOWN_HUBS_ADDED } = require('../../state-manager/')
-const { remotePeerDidAnnounce } = require('../../state-manager/actions')
+const { Actions } = require('../../state-manager/actions')
+const { remotePeerDidAnnounce } = Actions({})
 const pull = require('pull-stream')
 const Hub = require('signalhub')
 

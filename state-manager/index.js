@@ -1,9 +1,6 @@
 'use strict'
 
-const fs = require('fs')
 const pull = require('pull-stream')
-const SignalHub = require('signalhub')
-const { createSelector } = require('reselect')
 const { createStore, applyMiddleware } = require('redux')
 const onWakeup = require('on-wakeup')
 const onNetwork = require('on-change-network')
@@ -37,6 +34,4 @@ function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
   return { store, actions }
 }
 
-module.exports = {
-  App
-}
+module.exports = App

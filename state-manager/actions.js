@@ -28,6 +28,9 @@ function Actions ({ server, Hub, pubKey }) {
   }
 
   function hubAddressAdded ({hub}) {
+    // multiserver will start another listener when it gets this event
+    server.emit('RTC_HUB_ADDED', hub)
+
     return {
       type: HUB_ADDRESS_ADDED,
       hub

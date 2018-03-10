@@ -73,6 +73,12 @@ module.exports = function reducer (state, action) {
     case REMOTE_PEER_CONNECTION_SUCCEEDED: {
       if (action.peer === state.pubKey) { return state }
 
+      if (!state.hubs[action.hub].peers[action.peer]) {
+        state.hubs[action.hub].peers[action.peer] = {
+          connectionState: CONNECTION_STATE_DISCONNECTED
+        }
+      }
+
       state.hubs[action.hub].peers[action.peer].connectionState = CONNECTION_STATE_CONNECTED
       return Object.assign({}, state)
     }

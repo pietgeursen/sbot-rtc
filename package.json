@@ -18,7 +18,8 @@
     "reselect": "^3.0.1",
     "scuttle-testbot": "^1.1.4",
     "signalhub": "^4.9.0",
-    "simple-peer": "^8.3.0"
+    "simple-peer": "^8.3.0",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "ssb-keys": "^7.0.13",

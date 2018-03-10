@@ -13,6 +13,7 @@ const REMOTE_PEER_CONNECTION_SUCCEEDED = Symbol('REMOTE_PEER_CONNECTION_SUCCEEDE
 const REMOTE_PEER_CONNECTION_FAILED = Symbol('REMOTE_PEER_CONNECTION_FAILED')
 const REMOTE_PEER_DISCONNECT = Symbol('REMOTE_PEER_DISCONNECT')
 const PEER_CONNECTION_TIMER_TICKED = Symbol('PEER_CONNECTION_TIMER_TICKED')
+const REMOTE_PEER_CLIENT_DID_CONNECT = Symbol('REMOTE_PEER_CLIENT_DID_CONNECT')
 
 function Actions ({ server, Hub, pubKey }) {
   function networkDidReconnect () {
@@ -105,6 +106,14 @@ function Actions ({ server, Hub, pubKey }) {
     }
   }
 
+  function remotePeerClientDidConnect ({hub, peer}) {
+    return {
+      type: REMOTE_PEER_CLIENT_DID_CONNECT,
+      peer,
+      hub
+    }
+  }
+
   return {
     remotePeerDidAnnounce,
     remotePeerDidDisconnect,
@@ -112,6 +121,7 @@ function Actions ({ server, Hub, pubKey }) {
     remotePeerConnectionFailed,
     remotePeerConnecting,
     remotePeerDisconnect,
+    remotePeerClientDidConnect,
     peerConnectionTimerTicked, // has side effect
     hubAddressAdded,
     networkDidReconnect,
@@ -126,6 +136,7 @@ module.exports = {
   REMOTE_PEER_CONNECTION_FAILED,
   REMOTE_PEER_CONNECTING,
   REMOTE_PEER_DISCONNECT,
+  REMOTE_PEER_CLIENT_DID_CONNECT,
   PEER_CONNECTION_TIMER_TICKED,
   HUB_ADDRESS_ADDED,
   NETWORK_DID_RECONNECT,

@@ -14,6 +14,7 @@ var {
   REMOTE_PEER_CONNECTION_FAILED,
   REMOTE_PEER_CONNECTING,
   REMOTE_PEER_DISCONNECT,
+  REMOTE_PEER_CLIENT_DID_CONNECT,
   PEER_CONNECTION_TIMER_TICKED,
   HUB_ADDRESS_ADDED,
   NETWORK_DID_RECONNECT,
@@ -387,5 +388,42 @@ test('REMOTE_PEER_DISCONNECT', function (t) {
   }
   const newState = reducer(initialState, action)
   t.deepEqual(newState, expectedState, 'existing peer state changes to disconnecting')
+  t.end()
+})
+
+test('REMOTE_PEER_CLIENT_DID_CONNECT', function (t) {
+  const hub1 = {address: 'hub1.com'}
+  const hub2 = {address: 'hub2.com'}
+  const peer1 = {address: '@piet=.nope'}
+  const action = {type: REMOTE_PEER_CLIENT_DID_CONNECT, peer: peer1.address, hub: hub1.address}
+  const initialState = {
+    hubs: {
+      [hub1.address]: {
+        peers: {
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const expectedState = {
+    hubs: {
+      [hub1.address]: {
+        peers: {
+          [peer1.address]: {
+            connectionState: CONNECTION_STATE_CONNECTED
+          }
+        }
+      },
+      [hub2.address]: {
+        peers: {
+        }
+      }
+    }
+  }
+  const newState = reducer(initialState, action)
+  t.deepEqual(newState, expectedState, 'new peer is created and connection state is connected')
   t.end()
 })

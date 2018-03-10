@@ -6,7 +6,6 @@ const onWakeup = require('on-wakeup')
 const onNetwork = require('on-change-network')
 const {createLogger} = require('redux-logger')
 const thunk = require('redux-thunk').default
-const Url = require('url')
 
 const reducer = require('./reducer')
 const { Actions } = require('./actions')
@@ -23,7 +22,7 @@ function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
   const logger = createLogger({colors: loggerColors})
   const store = createStore(reducer, {hubs: {}}, applyMiddleware(logger, thunk))
   const actions = Actions({Hub, pubKey, server})
-  const { hubAddressAdded, remotePeerConnectionSucceeded } = actions
+  const { hubAddressAdded, remotePeerClientDidConnect } = actions
 
   pull(
     hubAddresses(),
@@ -33,8 +32,7 @@ function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
   )
 
   server.on('RTC_CLIENT_CONNECTED', ({peer, hub}) => {
-    //hub = Url(hub).hostname
-    store.dispatch(remotePeerConnectionSucceeded({hub, peer}))
+    store.dispatch(remotePeerClientDidConnect({hub, peer}))
   })
 
   return { store, actions }

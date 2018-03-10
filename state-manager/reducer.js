@@ -6,6 +6,7 @@ var {
   REMOTE_PEER_CONNECTING,
   REMOTE_PEER_CONNECTION_SUCCEEDED,
   REMOTE_PEER_CONNECTION_FAILED,
+  REMOTE_PEER_CLIENT_DID_CONNECT,
   NETWORK_DID_RECONNECT
 } = require('./actions')
 
@@ -73,12 +74,6 @@ module.exports = function reducer (state, action) {
     case REMOTE_PEER_CONNECTION_SUCCEEDED: {
       if (action.peer === state.pubKey) { return state }
 
-      if (!state.hubs[action.hub].peers[action.peer]) {
-        state.hubs[action.hub].peers[action.peer] = {
-          connectionState: CONNECTION_STATE_DISCONNECTED
-        }
-      }
-
       state.hubs[action.hub].peers[action.peer].connectionState = CONNECTION_STATE_CONNECTED
       return Object.assign({}, state)
     }
@@ -92,6 +87,18 @@ module.exports = function reducer (state, action) {
       if (action.peer === state.pubKey) { return state }
 
       state.hubs[action.hub].peers[action.peer].connectionState = CONNECTION_STATE_DISCONNECTING
+      return Object.assign({}, state)
+    }
+    case REMOTE_PEER_CLIENT_DID_CONNECT: {
+      if (action.peer === state.pubKey) { return state }
+
+      if (!state.hubs[action.hub].peers[action.peer]) {
+        state.hubs[action.hub].peers[action.peer] = {
+          connectionState: CONNECTION_STATE_DISCONNECTED
+        }
+      }
+
+      state.hubs[action.hub].peers[action.peer].connectionState = CONNECTION_STATE_CONNECTED
       return Object.assign({}, state)
     }
     default:

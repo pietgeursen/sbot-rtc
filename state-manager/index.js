@@ -18,7 +18,9 @@ const loggerColors = {
   error: false
 }
 
-function App ({Hub, pubKey, loadHubs, server, hubAddresses}) {
+function App ({Hub, server, hubAddresses}) {
+  const pubKey = server.whoami()
+
   const logger = createLogger({colors: loggerColors})
   const store = createStore(reducer, {hubs: {}}, applyMiddleware(logger, thunk))
   const actions = Actions({Hub, pubKey, server})

@@ -18,7 +18,26 @@ This touches a lot in the stack.
 - [ ] handling the isDownloading state when scheduling peer connections.
 - [ ] version numbers!
 - [ ] de-prioritising hubs / peers if they fail to connect. 
-- [ ] weaving the hubs list into the multiserver server. => DONE!
+- [x] weaving the hubs list into the multiserver server.
+- [ ] standardise how hub and peer objects are passed around in the state manager and emitted by the sbot.
+- [ ] check how to make sure hub and peer connections can be forced closed. Is important for network and wake up events to trigger this. 
+- [ ] sanitise hub addresses properly. Multiserver addresses don't allow https as part of them. So multiserver rtc plugin _assumes_ https. 
+- [ ] test initial sync
+- [ ] steal the code that exposes the connected peers obs.
+
+## Current goal:
+
+- get a dev example going so I can try connect with mix.
+  - [ ] change modules in package.json to point at mine on github.
+    - [ ] fork ssb-ref, multiserver, secret-stack.
+  - [ ] make client test use state manager.
+  - [ ] suss out how to install a sbot plugin from command line. 
+
+## Next goal:
+
+- describe a peer manager that handles connecting and disconnecting to peers.
+
+
 
 ## Peers state manager
 
@@ -45,37 +64,24 @@ Example state:
 
 ### Actions
 
-`REMOTE_PEER_DID_ANNOUNCE` // gives hub address and remote.id
-
-`REMOTE_PEER_DID_DISCONNECT` // gives hub address and remote.id
-
-`REMOTE_PEER_CONNECTION_SUCCEEDED`
-
-`REMOTE_PEER_CONNECTION_FAILED`
-
-`DISCONNECT_FROM_REMOTE_PEER`
-
-`HUB_ADDRESS_ADDED`
-
-`HUB_ADDRESS_REMOVED`
-
-### Effects
-
-`SCHEDULE_PEERS_UPDATE_TICK`
-
-`SCHEDULE_ANNOUNCE_TO_HUB`
-
-`SCHEDULE_SAVE_HUBS`
-
-`SCHEDULE_CONNECT_TO_REMOTE_PEER`
-
-`SCHEDULE_BROADCAST_KNOWN_HUBS`
+REMOTE_PEER_DID_ANNOUNCE,
+REMOTE_PEER_DID_DISCONNECT,
+REMOTE_PEER_CONNECTION_SUCCEEDED,
+REMOTE_PEER_CONNECTION_FAILED,
+REMOTE_PEER_CONNECTING,
+REMOTE_PEER_DISCONNECT,
+REMOTE_PEER_CLIENT_DID_CONNECT,
+PEER_CONNECTION_TIMER_TICKED,
+HUB_ADDRESS_ADDED,
+NETWORK_DID_RECONNECT,
+CONNECT_TO_HUB,
+ANNOUNCE_TO_HUB,
 
 ### Features
 
 - [x] load a hub table
 - [x] Announce as a peer to all hubs.
-- [ ] maintain a table of known peers.
+- [x] maintain a table of known peers.
   - [x] add a peer when they announce
   - [ ] how do we remove a peer when they're gone?
     - [ ] a count of failures?
@@ -83,7 +89,7 @@ Example state:
     - [ ] check how swarm does it.
 - [ ] occasionally connect to some peers up to a maxiumum number of peers.
 - [ ] disconnect from a peer after some time. But not if it's downloading.
-- [ ] broadcast your table of known hubs to gossip them around. //??? 
+- [ ] broadcast your table of known hubs to gossip them around. => No. Use published messages. 
 - [ ] include version number in hub app name
 
 ### Example flow

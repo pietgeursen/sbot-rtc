@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tape 'test/state-manager/*.js' | tap-spec"
+    "test": "tape 'test/**/*.js' | tap-spec"
   },
   "author": "",
   "license": "ISC",

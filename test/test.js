@@ -21,39 +21,39 @@ CreateTestSbot
 
 var serverBot = CreateTestSbot({name: 'serverBot', keys: serverKeys})
 
-CreateTestSbot
-  .use(require('scuttlebot/plugins/replicate'))
-  .use({
-    init: (server) => {
-      server.emit('RTC_HUB_ADDED', introducerAddress)
-      server.connect(serverRTCAddress, (err, res) => {
-      })
-    },
-    name: 'rtc-client'
-  })
-
-var clientBot = CreateTestSbot({name: 'clientBot', keys: clientKeys})
-
 test('connects and replicates', function (t) {
   var expected = {type: 'test', content: 'So. Cool.'}
 
-  serverBot.publish(expected, () => {})
+  serverBot.publish(expected, () => {
+    CreateTestSbot
+      .use(require('scuttlebot/plugins/replicate'))
+      .use({
+        init: (server) => {
+          server.emit('RTC_HUB_ADDED', introducerAddress)
+          server.connect(serverRTCAddress, (err, res) => {
+          })
+        },
+        name: 'rtc-client'
+      })
 
-  clientBot.publish({
-    type: 'contact',
-    contact: serverKeys.id,
-    following: true
-  }, () => {})
+    var clientBot = CreateTestSbot({name: 'clientBot', keys: clientKeys})
 
-  pull(
-    clientBot.createHistoryStream({id: serverKeys.id, live: true}),
-    pull.drain(data => {
-      t.deepEqual(data.value.content, expected)
-      t.end()
-      clientBot.close()
-      serverBot.close()
-    })
-  )
+    clientBot.publish({
+      type: 'contact',
+      contact: serverKeys.id,
+      following: true
+    }, () => {})
 
-  clientBot.replicate.request(serverKeys.id)
+    pull(
+      clientBot.createHistoryStream({id: serverKeys.id, live: true}),
+      pull.drain(data => {
+        t.deepEqual(data.value.content, expected)
+        t.end()
+        clientBot.close()
+        serverBot.close()
+      })
+    )
+
+    clientBot.replicate.request(serverKeys.id)
+  })
 })

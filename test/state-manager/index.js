@@ -24,7 +24,7 @@ function createMockHub () {
   }
 }
 
-test('emitting hub address on stream adds that hub to the state', function (t) {
+test.skip('emitting hub address on stream adds that hub to the state', function (t) {
   const hub = {address: 'dfjdfksdfd.com'}
   const hubAddresses = Push()
   const mockHub = createMockHub()
@@ -37,7 +37,7 @@ test('emitting hub address on stream adds that hub to the state', function (t) {
   t.end()
 })
 
-test('peer announce adds peer to correct hub', function (t) {
+test.skip('peer announce adds peer to correct hub', function (t) {
   const hub = {address: 'dfjdfksdfd.com'}
   const peer = {address: '@piet=.nope'}
   const hubAddresses = Push()

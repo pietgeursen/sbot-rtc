@@ -16,9 +16,10 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
-    "scuttle-testbot": "^1.1.4",
+    "scuttle-testbot": "git://github.com/ssbc/scuttle-testbot.git#rtc",
     "signalhub": "^4.9.0",
     "simple-peer": "^8.3.0",
+    "ssb-ref": "git://github.com/ssbc/ssb-ref.git#rtc",
     "url": "^0.11.0"
   },
   "devDependencies": {

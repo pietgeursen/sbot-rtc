@@ -3,7 +3,6 @@ var CreateTestSbot = require('scuttle-testbot')
 var {serverKeys, clientKeys} = require('./keys.json')
 var ssbRef = require('ssb-ref')
 var pull = require('pull-stream')
-var ssbFriends = require('ssb-friends')
 
 var serverKey = serverKeys.id.match(ssbRef.feedIdRegex)[1]
 var introducerAddress = 'signalhub-hzbibrznqa.now.sh'
@@ -18,6 +17,7 @@ test('connects and replicates', function (t) {
         console.log('server init')
         server.emit('RTC_HUB_ADDED', introducerAddress)
         server.connect(serverRTCAddress, (err, res) => {
+          console.log(err, res)
         })
       },
       name: 'rtc-client'
